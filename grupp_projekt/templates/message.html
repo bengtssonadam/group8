@@ -13,3 +13,50 @@
         <input class="send-button" type="submit" value="Send" />
     </form>
 {% endblock %}
+
+% block scripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <script src="{{ url_for('static', filename='js/rsa.js') }}"></script>
+
+    <script>
+    function encryptMessage() {
+        let aesKey = key = CryptoJS.lib.WordArray.random(16).toString();
+
+        let rsaEncrypt = new JSEncrypt();
+        let publicKey = document.getElementById("user-pubkey").value;
+
+        let message = {
+            title: document.getElementById("title").value,
+            body: document.getElementById("body").innerHTML
+        }
+
+        let msgJson = JSON.stringify(message);
+
+        let encryptedMessage = CryptoJS.AES.encrypt(msgJson, aesKey);
+
+        rsaEncrypt.setPublicKey(publicKey);
+
+        let encryptedAESKey = rsaEncrypt.encrypt(aesKey);
+
+        let msgToSend = {
+            receiverId: document.getElementById("user-id").value,
+            encryptedMessage: encryptedMessage.toString(),
+            encryptedKey: encryptedAESKey.toString()
+        }
+
+        let jsonStrToSend = JSON.stringify(msgToSend);
+        fetch('http://127.0.0.1:5010/message', {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: jsonStrToSend
+        }).then(()=>{
+            location.href='/profile';
+        });
+
+    }
+
+    </script>
+
+{% endblock %}

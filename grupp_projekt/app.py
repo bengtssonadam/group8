@@ -1,5 +1,5 @@
 import dotenv
-from flask import Flask
+from flask import Flask, render_template, request, redirect, url_for
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
@@ -33,13 +33,14 @@ def create_app():
         from models import User
         return User.query.filter_by(id=user_id).first()
 
-    # Register the open blueprint with the app object
     from blueprints.open import bp_open
     app.register_blueprint(bp_open)
 
-    # Register the user blueprint with the app object
     from blueprints.user import bp_user
     app.register_blueprint(bp_user)
+
+    from blueprints.api import bp_api
+    app.register_blueprint(bp_api, url_prefix='/api/v1.0')
 
     return app
 

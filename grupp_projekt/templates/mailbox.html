@@ -9,10 +9,10 @@
 
     <table>
         <tr>
-            <th>Sender</th>
-            <th>Sent</th>
-            <th>Title</th>
-            <th>Message Body</th>
+            <th>From:</th>
+            <th>Sent:</th>
+            <th>Title:</th>
+            <th>Message</th>
         </tr>
         {% for message in messages %}
             <tr>
@@ -27,5 +27,56 @@
             </tr>
         {% endfor %}
     </table>
+
+    <div>
+     <br /> <br />
+    <h2>Upload your private Rsa-Key to read your messages.</h2>
+    <input type="file" id="priv-file" enctype="multipart/form-data" />
+    <button type="button" onclick="readPrivateKey()">Upload private Rsa-Key</button><span id="priv-loaded"></span>
+
+    <br /> <br />
+    <button onclick="rsaDecrypt()">Decrypt the Message</button>
+    <p id="decrypted"></p>
+    <br /> <br />
+    <br /> <br />
+    <input type="text" placeholder="Krypterat meddelande RSA" />
+      <br />
+    <input type="text" placeholder="Krypterat meddelande AES" />
+    <input type="text" placeholder="AES-key" /> <br />
+    <input type="text" placeholder=" Meddelandet " /> <br />
+
+    <script src="../static/js/rsa.js"></script>
+         let privateKey;
+
+        function readPrivateKey() {
+            let files = document.getElementById("priv-file").files;
+            let file = files[0];
+            let reader = new FileReader();
+
+            reader.onloadend = function (event) {
+                privateKey = event.target.result;
+                privateKey = privateKey.replace(/(\r\n|\n|\r)/gm, "");
+                document.getElementById("priv-loaded").innerHTML = "Private key loaded";
+            };
+
+            reader.readAsText(file);
+        }
+
+
+        function rsaDecrypt() {
+
+            let cipher = document.getElementById("encrypted").innerHTML;
+
+            let rsaEncrypt = new JSEncrypt();
+
+            rsaEncrypt.setPrivateKey(privateKey);
+
+            let plainText = rsaEncrypt.decrypt(cipher);
+
+            document.getElementById("decrypted").innerHTML = plainText;
+        }
+    </script>
+
+    </div>
 
 {% endblock %}
